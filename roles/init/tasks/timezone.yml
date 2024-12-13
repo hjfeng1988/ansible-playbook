@@ -1,0 +1,3 @@
+- name: set timezone to Asia/Shanghai
+  community.general.timezone:
+    name: Asia/Shanghai

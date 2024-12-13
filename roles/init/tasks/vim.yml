@@ -1,0 +1,8 @@
+- name: add in /etc/vimrc
+  blockinfile:
+    path: /etc/vimrc
+    block: |
+      set paste
+      set tabstop=4
+      set expandtab
+    marker: '" {mark} ANSIBLE MANAGED BLOCK'

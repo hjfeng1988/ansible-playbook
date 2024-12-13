@@ -1,0 +1,6 @@
+---
+- name: install jdk play
+  hosts: app
+  gather_facts: no
+  tasks:
+    - import_tasks: playbook/jdk.yml

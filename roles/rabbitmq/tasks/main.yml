@@ -1,0 +1,5 @@
+---
+# tasks file for rabbitmq
+- import_tasks: erlang.yml
+- import_tasks: prepare.yml
+- import_tasks: rabbitmq.yml

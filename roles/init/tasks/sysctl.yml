@@ -1,0 +1,8 @@
+- name: copy to /etc/sysctl.d
+  copy:
+    src: 999-sysctl.conf
+    dest: /etc/sysctl.d
+
+- name: make sysctl.conf effective immediately
+  shell:
+    cmd: sysctl -q --system

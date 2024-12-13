@@ -1,0 +1,17 @@
+---
+- import_tasks: hostname.yml
+
+- import_tasks: pkg.yml
+- import_tasks: vim.yml
+
+- import_tasks: chrony.yml
+- import_tasks: timezone.yml
+
+- import_tasks: sshd.yml
+
+- import_tasks: sysctl.yml
+- import_tasks: ulimit.yml
+
+- import_tasks: selinux.yml
+- import_tasks: service.yml
+- import_tasks: unimport-lvm.yml

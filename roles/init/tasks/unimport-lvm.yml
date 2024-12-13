@@ -1,0 +1,23 @@
+- name: create vg
+  community.general.lvg:
+    vg: vg1
+    pvs: /dev/sdb
+
+- name: create lvs
+  community.general.lvol:
+    vg: vg1
+    lv: lv1-data
+    size: 100%VG
+
+
+- name: formate filesystem
+  community.general.filesystem:
+    fstype: xfs
+    dev: /dev/vg1/lv1-data
+
+- name: mount lvs
+  ansible.posix.mount:
+    path: /data
+    src: /dev/vg1/lv1-data
+    fstype: xfs
+    state: mounted

@@ -1,0 +1,12 @@
+- name: Disable selinux in config
+  ansible.posix.selinux:
+    state: disabled
+
+- name: Register selinux variable
+  shell: awk -F'=' '/^SELINUX=/{print $2}' /etc/selinux/config
+  register: selinux
+
+- name: Disable selinux on the fly
+  shell:
+    cmd: setenforce 0
+  when: selinux.stdout != "disabled"

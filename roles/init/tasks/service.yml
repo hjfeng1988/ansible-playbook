@@ -1,0 +1,9 @@
+- name: Disable services and stop
+  systemd:
+    name: "{{item}}"
+    state: stopped
+    enabled: no
+  loop:
+  - firewalld
+  #- postfix
+  #ignore_errors: true
