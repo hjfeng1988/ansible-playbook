@@ -3,6 +3,7 @@
     path: /etc/ssh/sshd_config
     line: "UseDNS no"
     state: present
+  notify: "restart sshd"
 
 - name: Disable UseDNS 2
   lineinfile:

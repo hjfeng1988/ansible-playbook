@@ -1,10 +1,10 @@
 - name: Install common tool
   yum:
-    name: bash-completion,bind-utils,dos2unix,unzip,net-tools,telnet,wget,lrzsz,lvm2,epel-release,vim
+    name: bash-completion,lsof,bind-utils,net-tools,telnet,wget,lrzsz,lvm2,epel-release,vim,tar,unzip,dos2unix,tree
     state: present
 
 
 - name: Install performance tool
   yum:
-    name: htop,iftop,lsof,sysstat,tcpdump,tmux,traceroute,tree
+    name: htop,iftop,sysstat,tcpdump,traceroute,tmux
     state: present

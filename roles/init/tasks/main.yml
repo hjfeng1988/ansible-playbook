@@ -14,4 +14,6 @@
 
 - import_tasks: selinux.yml
 - import_tasks: service.yml
-- import_tasks: unimport-lvm.yml
+
+- import_tasks: lvm.yml
+  when: ansible_devices.sdb is defined
