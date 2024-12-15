@@ -1,6 +1,5 @@
 # ansible-playbook
 
-
 ### 
 ```
 系统初始化首次需要密码
