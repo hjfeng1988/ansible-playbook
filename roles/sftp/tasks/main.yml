@@ -1,20 +1,11 @@
 ---
 # tasks file for sftp
 
-- name: comment default Subsystem
-  replace:
-    path: /etc/ssh/sshd_config
-    regexp: '(^Subsystem.*openssh/sftp-server)'
-    replace: '#\1'
-
 - name: add new config
   blockinfile:
     path: /etc/ssh/sshd_config
     block: |
-      Subsystem sftp internal-sftp
       Match Group sftp
-          X11Forwarding      no
-          AllowTcpForwarding no
           ForceCommand       internal-sftp
           ChrootDirectory    /data/sftp/%u
 
@@ -27,31 +18,24 @@
   group:
     name: sftp
 
-- name: add user and set group
+- name: add user to group
   user:
     name: "{{ user }}"
     password: "{{ password | password_hash('sha512') }}"
     group: sftp
     shell: /sbin/nologin
+    home: /upload
     create_home: no
   when:
     - user is defined
     - password is defined
 
-- name: mkdir sftp data directory
-  file:
-    path: /data/sftp/{{ user }}/data
-    state: directory
+- name: mkdir upload directory
+  shell: |
+    mkdir -p /data/sftp/{{ user }}/upload
+    chown -R root:sftp /data/sftp/{{ user }}
+    chown -R {{ user }}:sftp /data/sftp/{{ user }}/upload
   when:
     - user is defined
     - password is defined
 
-- name: change owner of sftp's subdirectory
-  file:
-    path: /data/sftp/{{ user }}/data
-    state: directory
-    owner: "{{ user }}"
-    group: sftp
-  when:
-    - user is defined
-    - password is defined

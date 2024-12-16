@@ -1,9 +1,10 @@
 ---
 # tasks file for zabbix_yum
 - name: install zabbix-agent
-  yum:
+  dnf:
     name: https://repo.zabbix.com/zabbix/7.0/alma/8/x86_64/zabbix-agent-7.0.5-release1.el8.x86_64.rpm
     state: present
+    disable_gpg_check: True
 
 - name: replace string in /etc/zabbix/zabbix_agentd.conf 1
   replace:

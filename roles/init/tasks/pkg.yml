@@ -1,10 +1,10 @@
 - name: Install common tool
-  yum:
+  dnf:
     name: bash-completion,lsof,bind-utils,net-tools,telnet,wget,lrzsz,lvm2,epel-release,vim,tar,unzip,dos2unix,tree
     state: present
 
 
 - name: Install performance tool
-  yum:
+  dnf:
     name: htop,iftop,sysstat,tcpdump,traceroute,tmux
     state: present
