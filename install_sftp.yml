@@ -1,6 +1,6 @@
 ---
 - name: install sftp play
-  hosts: all
+  hosts: app
   gather_facts: no
   roles:
     - sftp

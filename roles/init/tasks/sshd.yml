@@ -1,19 +1,36 @@
-- name: Disable UseDNS 1
+- name: Disable UseDNS
   lineinfile:
     path: /etc/ssh/sshd_config
+    regexp: "^UseDNS.*"
     line: "UseDNS no"
-    state: present
-  notify: "restart sshd"
+  notify: reload sshd
 
-- name: Disable UseDNS 2
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    line: "UseDNS yes"
-    state: absent
-  notify: "restart sshd"
-
-- name: set root public key
+- name: add root public key
   ansible.posix.authorized_key:
     user: root
     state: present
     key: "{{lookup('file', 'root.pub')}}"
+
+- name: disable PasswordAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication.*"
+    line: "PasswordAuthentication no"
+  when: disable_password_auth is defined and disable_password_auth == "yes"
+  notify: reload sshd
+
+- name: disable ChallengeResponseAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^ChallengeResponseAuthentication.*"
+    line: "ChallengeResponseAuthentication no"
+  when: disable_password_auth is defined and disable_password_auth == "yes"
+  notify: reload sshd
+
+- name: disable PermitRootLogin
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin.*"
+    line: "PermitRootLogin no"
+  when: permit_root_login is defined and permit_root_login == "no"
+  notify: reload sshd

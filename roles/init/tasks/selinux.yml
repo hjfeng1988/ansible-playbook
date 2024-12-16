@@ -3,10 +3,9 @@
     state: disabled
 
 - name: Register selinux variable
-  shell: awk -F'=' '/^SELINUX=/{print $2}' /etc/selinux/config
+  shell: getenforce
   register: selinux
 
 - name: Disable selinux on the fly
-  shell:
-    cmd: setenforce 0
-  when: selinux.stdout != "disabled"
+  shell: setenforce 0
+  when: selinux.stdout != "Disabled"

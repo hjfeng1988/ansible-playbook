@@ -1,6 +1,5 @@
 - name: ntpdate time
-  shell:
-    cmd: ntpdate 0.centos.pool.ntp.org
+  shell: ntpdate 0.centos.pool.ntp.org
 
 - name: add to crontab
   cron:

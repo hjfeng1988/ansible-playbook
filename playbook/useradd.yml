@@ -13,13 +13,10 @@
         path: /etc/sudoers.d/{{ user }}
         line: "{{ user }} ALL=(ALL) NOPASSWD:ALL"
         create: yes
-      when:
-        - sudo is defined
-        - sudo == "yes"
+      when: sudo is defined and sudo == "yes"
+
     - name: remove sudo from user
       file:
         path: /etc/sudoers.d/{{ user }}
         state: absent
-      when:
-        - sudo is defined
-        - sudo == "no"
+      when: sudo is defined and sudo == "no"

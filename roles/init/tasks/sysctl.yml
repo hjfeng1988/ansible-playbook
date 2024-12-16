@@ -4,5 +4,4 @@
     dest: /etc/sysctl.d
 
 - name: make sysctl.conf effective immediately
-  shell:
-    cmd: sysctl -q --system
+  shell: sysctl -q --system

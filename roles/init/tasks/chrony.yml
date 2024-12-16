@@ -9,6 +9,5 @@
     state: started
     enabled: yes
 
-- name: Synchronize time by chronyc
-  shell:
-    cmd: chronyc makestep
+- name: Synchronize time immediately
+  shell: chronyc makestep

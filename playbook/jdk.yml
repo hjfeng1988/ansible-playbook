@@ -11,11 +11,10 @@
   vars:
     version: "8u301"
     version2: "1.8.0_301"
-  shell:
-    cmd: |
-      cd /usr/local/src
-      tar -zxf jdk-{{ version }}-linux-x64.tar.gz
-      mv jdk{{ version2 }} /usr/local/jdk
+  shell: |
+    cd /usr/local/src
+    tar -zxf jdk-{{ version }}-linux-x64.tar.gz
+    mv jdk{{ version2 }} /usr/local/jdk
   args:
     creates: /usr/local/jdk
 
