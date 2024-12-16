@@ -8,6 +8,7 @@
 - import_tasks: timezone.yml
 
 - import_tasks: sshd.yml
+- import_tasks: audit.yml
 
 - import_tasks: sysctl.yml
 - import_tasks: ulimit.yml
