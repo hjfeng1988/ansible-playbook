@@ -1,0 +1,77 @@
+- name: add redis user
+  user:
+    name: redis
+    system: yes
+
+- name: download redis
+  vars:
+    version: "6.0.10"
+  get_url:
+    #url: https://download.redis.io/releases/redis-{{ version }}.tar.gz
+    url: https://gitee.com/hjfeng1988/otj/raw/master/redis-{{ version }}.tar.gz
+    dest: /usr/local/src/redis-{{ version }}.tar.gz
+
+- name: install compile tools
+  dnf:
+    name: make,gcc
+    state: present
+
+- name: install redis
+  vars:
+    version: "6.0.10"
+  shell: |
+    tar xzf redis-{{ version }}.tar.gz
+    cd redis-{{ version }}
+    make
+    make PREFIX=/usr/local/redis install
+  args:
+    chdir: /usr/local/src
+    creates: /usr/local/redis
+
+- name: check if redis.log exists
+  stat:
+    path: /usr/local/redis/redis.log
+  register: redis_log
+
+- name: copy redis.conf
+  copy:
+    src: redis.conf
+    dest: /usr/local/redis/redis.conf
+  when: not redis_log.stat.exists
+
+- name: add password to redis.conf
+  blockinfile:
+    path: /usr/local/redis/redis.conf
+    block: |
+      requirepass {{redis_pass}}
+      masterauth {{redis_pass}}
+  when: not redis_log.stat.exists
+
+- name: add slaveof to redis.conf 
+  lineinfile:
+    path: /usr/local/redis/redis.conf
+    line: "slaveof {{groups['redis_master'][0]}} 6379"
+  when:
+    - not redis_log.stat.exists
+    - inventory_hostname in groups ['redis_slave']
+
+- name: copy redis.service
+  copy:
+    src: redis.service
+    dest: /usr/lib/systemd/system/redis.service
+
+- name: copy redis-shutdown
+  copy:
+    src: redis-shutdown
+    dest: /usr/local/redis/bin/redis-shutdown
+    mode: '0755'
+
+- name: chown redis directory
+  shell: |
+    chown -R redis:redis /usr/local/redis
+
+- name: Start redis service and enable on boot
+  systemd:
+    name: redis
+    state: started
+    enabled: yes

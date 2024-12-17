@@ -1,6 +1,0 @@
----
-- name: install redis play
-  hosts: redis_master,redis_slave
-  gather_facts: no
-  roles:
-    - redis

@@ -1,6 +1,5 @@
 ---
 # tasks file for sftp
-
 - name: add new config
   blockinfile:
     path: /etc/ssh/sshd_config
@@ -8,11 +7,7 @@
       Match Group sftp
           ForceCommand       internal-sftp
           ChrootDirectory    /data/sftp/%u
-
-- name: reload sshd
-  systemd:
-    name: sshd
-    state: reloaded
+  notify: reload sshd
 
 - name: groupadd sftp
   group:
@@ -26,16 +21,12 @@
     shell: /sbin/nologin
     home: /upload
     create_home: no
-  when:
-    - user is defined
-    - password is defined
+  when: user is defined and password is defined
 
 - name: mkdir upload directory
   shell: |
     mkdir -p /data/sftp/{{ user }}/upload
     chown -R root:sftp /data/sftp/{{ user }}
     chown -R {{ user }}:sftp /data/sftp/{{ user }}/upload
-  when:
-    - user is defined
-    - password is defined
+  when: user is defined and password is defined
 
