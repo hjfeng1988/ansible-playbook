@@ -3,24 +3,19 @@
     path: /usr/local/redis/redis-sentinel.log
   register: redis_sentinel_log
 
-- name: copy redis-sentinel.conf.conf
-  copy:
-    src: redis-sentinel.conf
-    dest: /usr/local/redis/redis-sentinel.conf
-  when: not redis_sentinel_log.stat.exists
-
-- name: modify redis-sentinel.conf mymaster
+- name: replace mymaster in redis-sentinel.conf
   replace:
     path: /usr/local/redis/redis-sentinel.conf
     regexp: "mymaster 127.0.0.1"
     replace: "mymaster {{groups['redis_master'][0]}}"
   when:  not redis_sentinel_log.stat.exists
 
-- name: append line to sentinel.conf
+- name: add auth-pass to sentinel.conf
   blockinfile:
     path: /usr/local/redis/redis-sentinel.conf
     block: |
       sentinel auth-pass mymaster {{redis_pass}}
+      requirepass {{redis_pass}}
   when: not redis_sentinel_log.stat.exists
 
 - name: copy redis-sentinel.service
@@ -33,3 +28,4 @@
     name: redis-sentinel
     state: started
     enabled: yes
+    daemon_reload: yes

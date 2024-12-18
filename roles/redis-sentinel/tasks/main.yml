@@ -1,4 +1,5 @@
 ---
-- import_tasks: optimize.yml
+# stop and disable server firewall by self-operation
+- import_tasks: optimization.yml
 - import_tasks: redis.yml
 - import_tasks: sentinel.yml

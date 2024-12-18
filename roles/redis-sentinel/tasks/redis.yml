@@ -8,12 +8,13 @@
     version: "6.0.10"
   get_url:
     #url: https://download.redis.io/releases/redis-{{ version }}.tar.gz
+    # use tmp url because my network has something wrong connnect with offical url.
     url: https://gitee.com/hjfeng1988/otj/raw/master/redis-{{ version }}.tar.gz
     dest: /usr/local/src/redis-{{ version }}.tar.gz
 
 - name: install compile tools
   dnf:
-    name: make,gcc
+    name: tar,make,gcc
     state: present
 
 - name: install redis
@@ -24,22 +25,33 @@
     cd redis-{{ version }}
     make
     make PREFIX=/usr/local/redis install
+    cp redis.conf /usr/local/redis/redis.conf
+    cp sentinel.conf /usr/local/redis/redis-sentinel.conf
+    chown -R redis:redis /usr/local/redis
+    sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@' /usr/local/redis/redis.conf
+    sed -i 's@^logfile ""@logfile /usr/local/redis/redis.log@' /usr/local/redis/redis.conf
+    sed -i 's@^dir ./@dir /usr/local/redis@' /usr/local/redis/redis.conf
+    sed -i 's@^# bind 127.0.0.1.*@bind 0.0.0.0@' /usr/local/redis/redis-sentinel.conf
+    sed -i 's@^# protected-mode no@protected-mode yes@' /usr/local/redis/redis-sentinel.conf
+    sed -i 's@^logfile ""@logfile /usr/local/redis/redis-sentinel.log@' /usr/local/redis/redis-sentinel.conf
   args:
     chdir: /usr/local/src
     creates: /usr/local/redis
+
+- name: copy redis-shutdown
+  copy:
+    src: redis-shutdown
+    dest: /usr/local/redis/bin/redis-shutdown
+    owner: redis
+    group: redis
+    mode: '0755'
 
 - name: check if redis.log exists
   stat:
     path: /usr/local/redis/redis.log
   register: redis_log
 
-- name: copy redis.conf
-  copy:
-    src: redis.conf
-    dest: /usr/local/redis/redis.conf
-  when: not redis_log.stat.exists
-
-- name: add password to redis.conf
+- name: add requirepass to redis.conf
   blockinfile:
     path: /usr/local/redis/redis.conf
     block: |
@@ -60,18 +72,9 @@
     src: redis.service
     dest: /usr/lib/systemd/system/redis.service
 
-- name: copy redis-shutdown
-  copy:
-    src: redis-shutdown
-    dest: /usr/local/redis/bin/redis-shutdown
-    mode: '0755'
-
-- name: chown redis directory
-  shell: |
-    chown -R redis:redis /usr/local/redis
-
 - name: Start redis service and enable on boot
   systemd:
     name: redis
     state: started
     enabled: yes
+    daemon_reload: yes

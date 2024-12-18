@@ -3,7 +3,8 @@
   blockinfile:
     path: /etc/rc.local
     block: |
-      echo never > /sys/kernel/mm/transparent_hugepage/enabled
+      echo 512 > /proc/sys/net/core/somaxconn
+      echo madvise > /sys/kernel/mm/transparent_hugepage/enabled
 
 - name: chmod /etc/rc.local
   file:
@@ -11,7 +12,9 @@
     mode: o+x
 
 - name: make hugepage effective immediately
-  shell: echo madvise > /sys/kernel/mm/transparent_hugepage/enabled
+  shell: |
+    echo 512 > /proc/sys/net/core/somaxconn
+    echo madvise > /sys/kernel/mm/transparent_hugepage/enabled
 
 # optimize 2
 - name: add file /etc/sysctl.d/91-redis.conf with content
