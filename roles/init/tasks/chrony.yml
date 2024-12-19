@@ -1,5 +1,5 @@
 - name: Install chrony
-  yum:
+  dnf:
     name: chrony
     state: present
 

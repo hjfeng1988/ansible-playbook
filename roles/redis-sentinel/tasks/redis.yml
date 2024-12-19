@@ -1,50 +1,47 @@
+- name: version variable
+  set_fact:
+    version: 6.0.10
+
 - name: add redis user
   user:
     name: redis
     system: yes
 
 - name: download redis
-  vars:
-    version: "6.0.10"
   get_url:
     #url: https://download.redis.io/releases/redis-{{ version }}.tar.gz
-    # use tmp url because my network has something wrong connnect with offical url.
+    # use tmp url because of my fuck bad network.
     url: https://gitee.com/hjfeng1988/otj/raw/master/redis-{{ version }}.tar.gz
     dest: /usr/local/src/redis-{{ version }}.tar.gz
 
 - name: install compile tools
   dnf:
-    name: tar,make,gcc
+    name: tar,make,gcc,systemd-devel
     state: present
 
 - name: install redis
-  vars:
-    version: "6.0.10"
   shell: |
     tar xzf redis-{{ version }}.tar.gz
     cd redis-{{ version }}
     make
-    make PREFIX=/usr/local/redis install
-    cp redis.conf /usr/local/redis/redis.conf
-    cp sentinel.conf /usr/local/redis/redis-sentinel.conf
-    chown -R redis:redis /usr/local/redis
-    sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@' /usr/local/redis/redis.conf
-    sed -i 's@^logfile ""@logfile /usr/local/redis/redis.log@' /usr/local/redis/redis.conf
-    sed -i 's@^dir ./@dir /usr/local/redis@' /usr/local/redis/redis.conf
-    sed -i 's@^# bind 127.0.0.1.*@bind 0.0.0.0@' /usr/local/redis/redis-sentinel.conf
-    sed -i 's@^# protected-mode no@protected-mode yes@' /usr/local/redis/redis-sentinel.conf
-    sed -i 's@^logfile ""@logfile /usr/local/redis/redis-sentinel.log@' /usr/local/redis/redis-sentinel.conf
+    make install PREFIX=/usr/local/redis
   args:
     chdir: /usr/local/src
     creates: /usr/local/redis
 
-- name: copy redis-shutdown
-  copy:
-    src: redis-shutdown
-    dest: /usr/local/redis/bin/redis-shutdown
-    owner: redis
-    group: redis
-    mode: '0755'
+- name: configure redis.conf
+  shell: |
+    cp /usr/local/src/redis-{{ version }}/redis.conf redis.conf
+    cp /usr/local/src/redis-{{ version }}/sentinel.conf redis-sentinel.conf
+    sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@' redis.conf
+    sed -i 's@^logfile ""@logfile /usr/local/redis/redis.log@' redis.conf
+    sed -i 's@^dir ./@dir /usr/local/redis@' redis.conf
+    sed -i 's@^# bind 127.0.0.1.*@bind 0.0.0.0@' redis-sentinel.conf
+    sed -i 's@^logfile ""@logfile /usr/local/redis/redis-sentinel.log@' redis-sentinel.conf
+    chown -R redis:redis /usr/local/redis
+  args:
+    chdir: /usr/local/redis
+    creates: /usr/local/redis/redis.log
 
 - name: check if redis.log exists
   stat:
@@ -66,6 +63,14 @@
   when:
     - not redis_log.stat.exists
     - inventory_hostname in groups ['redis_slave']
+
+- name: copy redis-shutdown
+  copy:
+    src: redis-shutdown
+    dest: /usr/local/redis/bin/redis-shutdown
+    owner: redis
+    group: redis
+    mode: '0755'
 
 - name: copy redis.service
   copy:

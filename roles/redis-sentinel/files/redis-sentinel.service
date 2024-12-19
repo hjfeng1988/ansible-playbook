@@ -5,7 +5,7 @@ After=network.target
 [Service]
 ExecStart=/usr/local/redis/bin/redis-sentinel /usr/local/redis/redis-sentinel.conf --daemonize no --supervised systemd
 ExecStop=/usr/local/redis/bin/redis-shutdown redis-sentinel
-Type=simple
+Type=notify
 User=redis
 Group=redis
 RuntimeDirectory=redis
@@ -16,5 +16,3 @@ WantedBy=multi-user.target
 
 [Service]
 LimitNOFILE=10240
-TimeoutStartSec=90s
-TimeoutStopSec=90s
